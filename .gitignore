@@ -3,6 +3,3 @@ __pycache__/
 .DS_Store
 *.tgz
 data/
-resources/*.tsv
-resources/*.csv
-!resources/.gitkeep
