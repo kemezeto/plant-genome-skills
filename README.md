@@ -8,7 +8,7 @@
 |------|----------|------|
 | [01-plant-genome-compare-framework](01-plant-genome-compare-framework/) | 总框架 0–6 | 阶段顺序、分界点、子 skill 挂接 |
 | [02-omics-resource-download](02-omics-resource-download/) | 阶段 1 | 预下载列表 → 解析链接 → 下载/人工补货/统计 |
-| [03-genome-preprocess](03-genome-preprocess/) | 阶段 2 | 预处理骨架（脚本暂空） |
+| [03-genome-preprocess](03-genome-preprocess/) | 阶段 2 | 异源归类 → canonical → bridge，对接外部 HXC 预处理 |
 | [resources](resources/) | 源表与中间表 | 步骤 1 输入与解析结果，见下 |
 
 原始 skill id（本机 workflows 文件夹名）：
@@ -20,8 +20,21 @@
 ## 使用
 
 1. 把某一目录整份拷进助手的 skills / workflows，或按你的 Bot 文档导入 `SKILL.md`。
-2. 阶段 1 脚本在 `02-omics-resource-download/scripts/`，读写仓库里的 `resources/` 表。基因组大文件放在本机 `data/downloads/`，不要提交进本仓库。
+2. 阶段 1 脚本在 `02-omics-resource-download/scripts/`，读写仓库里的 `resources/` 表。阶段 2 脚本在 `03-genome-preprocess/scripts/`。基因组大文件放在本机 `data/downloads/`，不要提交进本仓库。
 3. 改流程先改 `01-…` 的分界表，再改对应子 skill。
+
+## 阶段 2 预处理（已对接 HXC）
+
+`03-genome-preprocess/` 已从骨架补全：步骤 0/1 做异源格式归类与 canonical 选择，步骤 2 用 bridge 把 manifest 接到外部仓库 [hxc-plant-genome-preprocess](https://github.com/HXC-code/hxc-plant-genome-preprocess)，写出 `clean_v2/` 与 `analysis_v2/`（WGDI 四件套）。日常操作卡见根目录 [`PREPROCESS.md`](PREPROCESS.md)。
+
+HXC 本体请单独 clone 为 vendor，**不要**把该仓库整份拷进本仓库：
+
+```bash
+git clone https://github.com/HXC-code/hxc-plant-genome-preprocess.git /path/to/vendor/hxc-plant-genome-preprocess
+export HXC_ROOT=/path/to/vendor/hxc-plant-genome-preprocess
+```
+
+本 skills 仓库不含 DEMO `showid=900` 的数据文件；该样例留在工作区或 HXC 测试中，不入库。
 
 ## 资源表
 
