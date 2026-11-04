@@ -2,7 +2,8 @@
 
 工作根：`/workspace/plant-genome-resources`  
 Skill：`/home/box/agent-data/workflows/skill-1793419436579`  
-HXC vendor：`/workspace/vendor/hxc-plant-genome-preprocess`
+上游 WGDI 预处理 vendor：`/workspace/vendor/plant-genome-wgdi-preprocess`  
+上游仓：`https://github.com/HXC-code/hxc-plant-genome-preprocess`
 
 ## 三连（日常）
 
@@ -23,8 +24,8 @@ python3 scripts/preprocess/step1_select_canonical.py \
   --downloads-dir data/downloads \
   -o resources/preprocess_input_manifest.tsv
 
-# 2) bridge + HXC（把 ID / 期望种数换成你的）
-bash scripts/preprocess/run_hxc_preprocess.sh . \
+# 2) bridge + WGDI 预处理（把 ID / 期望种数换成你的）
+bash scripts/preprocess/run_wgdi_preprocess.sh . \
   --sync-inventory --prepare-accession \
   --species 900 --expected-count 1
 
@@ -38,6 +39,6 @@ bash scripts/preprocess/run_hxc_preprocess.sh . \
 - inventory 的 gff/cds/pep **每列一个文件名**，不要 `|` 拼接。
 - 缺统一 `GCA_/GCF_` 前缀时靠 `--prepare-accession` 硬链别名；**勿删 raw**。
 - 仅三角齐全（gff+cds+pep）可跑；不会自动从 genome 抽 CDS。
-- DEMO：`showid=900` 已可过 HXC。
+- DEMO：`showid=900` 已可过上游流水线。
 
-更多：`skill …/references/hxc-integration.md`。
+更多：`skill …/references/wgdi-preprocess-integration.md`。

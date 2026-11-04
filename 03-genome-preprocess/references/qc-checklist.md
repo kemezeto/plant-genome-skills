@@ -45,13 +45,13 @@ seqkit fx2tab -n -l clean/Abedis/ASM1/Abedis.cds.fa | awk '$2%3!=0{c++} END{prin
 ```
 
 
-## HXC validate（步骤 2+ 硬门）
+## 上游 validate（步骤 2+ 硬门）
 
-对接 HXC 后，粗质检以管道自带 validate 为准：
+对接上游 WGDI 预处理后，粗质检以管道自带 validate 为准：
 
 - [ ] `resources/stage_preprocess_v2_summary.tsv` 目标种 `status=OK`
 - [ ] `resources/wgdi_v2_index.tsv` 对应行 `wgdi_ready=yes`
-- [ ] `bash …/run_hxc_preprocess.sh . --species ID --expected-count N` 打印 `[PASS]`
+- [ ] `bash …/run_wgdi_preprocess.sh . --species ID --expected-count N` 打印 `[PASS]`
 - [ ] 四件套与 `gene_map`/`chr_map` 路径可读；勿混用过滤前后文件
 
-契约与拒因：vendor `references/validation-rules.md`；常见 FAIL 见本目录 `hxc-integration.md`。
+契约与拒因：vendor `references/validation-rules.md`；常见 FAIL 见本目录 `wgdi-preprocess-integration.md`。

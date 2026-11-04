@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""Prepare HXC-compatible accession-prefixed aliases without moving raw files.
+"""Prepare WGDI-preprocess-compatible accession-prefixed aliases without moving raw files.
 
-HXC `_discover_accession` requires gff/cds/pep basenames to share exactly one
-NCBI-style `GCA_/GCF_<digits>.<digits>_` prefix. Non-NCBI names fail with
-`accession_mismatch`.
+Upstream pgci_preprocess `_discover_accession` requires gff/cds/pep basenames to
+share exactly one NCBI-style `GCA_/GCF_<digits>.<digits>_` prefix. Non-NCBI names
+fail with `accession_mismatch`.
 
 This adapter:
   - never deletes or renames original downloads
   - creates hard links (fallback: copy) beside the original as
     `{ACCESSION}_{original_basename}` when needed
   - updates `resources/download_inventory.tsv` gff/cds/pep to the alias names
-  - backups prior inventory to `download_inventory.pre_hxc.tsv` (once per run)
-  - writes `resources/hxc_run_inventory.tsv` (species that have the triangle)
-  - writes `resources/hxc_accession_alias_log.tsv`
+  - backups prior inventory to `download_inventory.pre_wgdi.tsv` (once per run)
+  - writes `resources/wgdi_run_inventory.tsv` (species that have the triangle)
+  - writes `resources/wgdi_accession_alias_log.tsv`
 
 Staging aliases under data/downloads may be deleted later; raw originals stay.
 """
@@ -93,9 +93,9 @@ def main() -> int:
     args = parse_args()
     root = args.project_root.resolve()
     inventory_path = root / "resources" / "download_inventory.tsv"
-    backup_path = root / "resources" / "download_inventory.pre_hxc.tsv"
-    run_inv_path = root / "resources" / "hxc_run_inventory.tsv"
-    alias_log_path = root / "resources" / "hxc_accession_alias_log.tsv"
+    backup_path = root / "resources" / "download_inventory.pre_wgdi.tsv"
+    run_inv_path = root / "resources" / "wgdi_run_inventory.tsv"
+    alias_log_path = root / "resources" / "wgdi_accession_alias_log.tsv"
     downloads = root / "data" / "downloads"
 
     if not inventory_path.is_file():
@@ -218,7 +218,7 @@ def main() -> int:
             shutil.copy2(inventory_path, backup_path)
             print(f"Backup inventory → {backup_path}")
         elif changed:
-            # Always refresh pre_hxc? User said 若需 backup once; keep existing backup.
+            # Always refresh pre_wgdi? Keep existing backup once.
             print(f"Kept existing backup: {backup_path}")
 
         if changed:
@@ -262,7 +262,7 @@ def main() -> int:
     print(f"Triangle-ready species prepared: {len(run_rows)}")
     print(f"Alias log entries: {len(alias_log)}" + (" (dry-run)" if args.dry_run else ""))
     if not args.dry_run:
-        print(f"hxc_run_inventory: {run_inv_path}")
+        print(f"wgdi_run_inventory: {run_inv_path}")
         print(f"alias log: {alias_log_path}")
         print("Note: alias files under data/downloads may be deleted; raw originals must stay.")
     return 0

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Bridge: preprocess_input_manifest.tsv → download_inventory.tsv basenames for HXC.
+"""Bridge: preprocess_input_manifest.tsv → download_inventory.tsv basenames for WGDI preprocess.
 
-HXC discover_species reads resources/download_inventory.tsv columns
-showid/Species/Order/Family/gff/cds/pep and expects a *single* basename per
-column (no '|' joins). This script writes basenames from the stage-2
+Upstream pgci_preprocess discover_species reads resources/download_inventory.tsv
+columns showid/Species/Order/Family/gff/cds/pep and expects a *single* basename
+per column (no '|' joins). This script writes basenames from the stage-2
 canonical manifest into those columns without deleting other inventory rows.
 """
 from __future__ import annotations
@@ -181,7 +181,7 @@ def main() -> int:
             basename = Path(chosen_path).name
             chosen[file_type] = basename
 
-        # gff column: prefer gff, else gtf (HXC only reads gff).
+        # gff column: prefer gff, else gtf (upstream only reads gff).
         if "gff" in chosen:
             gff_name = chosen["gff"]
             action = "set_gff"
@@ -266,7 +266,7 @@ def main() -> int:
 
     print(f"Updated inventory: {inventory_path}")
     print(f"Bridge log: {bridge_log_path} ({len(bridge_rows)} actions)")
-    print(f"Species with complete gff+cds+pep triangle (HXC-runnable candidates): {complete}")
+    print(f"Species with complete gff+cds+pep triangle (WGDI-preprocess-runnable candidates): {complete}")
     if gtf_as_gff_warnings:
         print(f"gtf-as-gff warnings: {len(gtf_as_gff_warnings)}")
     return 0

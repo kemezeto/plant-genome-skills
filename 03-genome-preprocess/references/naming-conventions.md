@@ -66,9 +66,9 @@ genome 与 gff 必须能通过 `raw_id` 或 `clean_id` 对齐；无法对齐则�
 另见阶段 2 入口汇总：`resources/preprocess_input_manifest.tsv`（选定的 raw 路径）→ 清洗后写 `clean/.../manifest.tsv`。
 
 
-## HXC / WGDI 产出命名（步骤 2+）
+## WGDI 预处理产出命名（步骤 2+）
 
-对接 HXC 后，阶段 2 主产出改为：
+对接上游 WGDI 预处理后，阶段 2 主产出改为：
 
 ```text
 clean_v2/s{showid}/{code}.gene_map.tsv

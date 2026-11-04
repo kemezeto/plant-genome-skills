@@ -1,9 +1,8 @@
 ---
 name: 植物基因组数据预处理
 description: >-
-  当阶段1资源已下载、要通过1→2分界做异源格式归类汇总，再经 step0/1 选定 canonical，并用 bridge 对接
-  HXC（hxc-plant-genome-preprocess）写出 clean_v2/analysis_v2 WGDI 四件套与
-  chr_map/gene_map、过 validate 后进入阶段3时使用。
+  当阶段1资源已下载、要通过1→2分界做异源格式归类汇总，再经 step0/1 选定 canonical，并用 bridge 对接上游 WGDI
+  预处理流水线写出 clean_v2/analysis_v2 WGDI 四件套与 chr_map/gene_map、过 validate 后进入阶段3时使用。
 ---
 # 植物基因组数据预处理
 
@@ -14,11 +13,11 @@ description: >-
 | 分界 | 含义 |
 |------|------|
 | **入口 1→2** | 阶段1完成：版本/链接表齐全；目标种有所需类型（或已记缺失）；`download_inventory.tsv` 已刷新。下载物可来自多站点、格式杂乱——**先归类汇总，再清洗**。 |
-| **阶段内** | 步骤0 归类 → 步骤1 选 canonical → **步骤2 bridge + HXC** 标准化为 WGDI bundle |
-| **出口 2→3** | `analysis_v2/s{id}/` WGDI 四件套（cds/pep/new.gff/lens）+ `clean_v2` 的 chr_map/gene_map 过 HXC validate；summary `status=OK` → 回总流程进 BLAST |
+| **阶段内** | 步骤0 归类 → 步骤1 选 canonical → **步骤2 bridge + WGDI 预处理** 标准化为 WGDI bundle |
+| **出口 2→3** | `analysis_v2/s{id}/` WGDI 四件套（cds/pep/new.gff/lens）+ `clean_v2` 的 chr_map/gene_map 过上游 validate；summary `status=OK` → 回总流程进 BLAST |
 
 下载与文件夹规范见阶段1 skill（`skill-1793405308920`）。**不要**在本阶段 `--yes` 真下载大文件。  
-HXC 对接细节：`references/hxc-integration.md`。
+上游对接细节：`references/wgdi-preprocess-integration.md`。
 
 ## 2. 目录结构
 
@@ -31,25 +30,26 @@ HXC 对接细节：`references/hxc-integration.md`。
 │   ├── step0_summarize_raw.py
 │   ├── step1_select_canonical.py
 │   ├── step2_sync_inventory_from_manifest.py
-│   ├── step2_prepare_hxc_inputs.py
-│   └── run_hxc_preprocess.sh
+│   ├── step2_prepare_wgdi_inputs.py
+│   └── run_wgdi_preprocess.sh
 ├── references/
 │   ├── raw-classify.md
 │   ├── preprocess-layout.md
 │   ├── naming-conventions.md
 │   ├── qc-checklist.md
-│   └── hxc-integration.md
+│   └── wgdi-preprocess-integration.md
 └── assets/
 
 工作区（示例）plant-genome-resources/
 ├── data/downloads/{showid}_{Order}_{Family}({Species})/
-├── resources/   # catalog / matrix / manifest / inventory / HXC summary
-├── clean_v2/    # HXC 映射与拒因
-├── analysis_v2/ # HXC WGDI 四件套
+├── resources/   # catalog / matrix / manifest / inventory / preprocess summary
+├── clean_v2/    # 上游映射与拒因
+├── analysis_v2/ # WGDI 四件套
 └── scripts/preprocess/   # 本 skill 脚本副本
 
 Vendor（只读对待源码）:
-  /workspace/vendor/hxc-plant-genome-preprocess
+  /workspace/vendor/plant-genome-wgdi-preprocess
+  # 上游仓 URL: https://github.com/HXC-code/hxc-plant-genome-preprocess
 ```
 
 细节见 `references/preprocess-layout.md`。
@@ -97,9 +97,9 @@ python3 "$SK/step1_select_canonical.py" \
 
 混合压缩包（`other_*_tar`）不会自动入选；需人工解包后再跑步骤 0。
 
-## 5. 步骤 2：Bridge + HXC 标准化
+## 5. 步骤 2：Bridge + WGDI 预处理标准化
 
-HXC 读取固定路径 `resources/download_inventory.tsv`（每列**单个** basename）与 `data/downloads/…`，要求 gff/cds/pep 文件名共享同一 `GCA_/GCF_\d+.\d+_` 前缀。
+上游流水线读取固定路径 `resources/download_inventory.tsv`（每列**单个** basename）与 `data/downloads/…`，要求 gff/cds/pep 文件名共享同一 `GCA_/GCF_\d+.\d+_` 前缀。
 
 ### 5.1 同步 inventory（manifest → basename）
 
@@ -113,15 +113,15 @@ python3 "$SK/step2_sync_inventory_from_manifest.py" --project-root .
 ### 5.2 Accession 适配（不改 raw 语义）
 
 ```bash
-python3 "$SK/step2_prepare_hxc_inputs.py" --project-root . [--species ID]
+python3 "$SK/step2_prepare_wgdi_inputs.py" --project-root . [--species ID]
 ```
 
-对三角齐全但缺统一 accession 的物种：在同目录硬链 `GCA_…_<原名>`（或占位 `GCA_000000000.0_`），更新 inventory 指向别名；备份 `download_inventory.pre_hxc.tsv`；旁路 `hxc_run_inventory.tsv` / `hxc_accession_alias_log.tsv`。别名可删，原文件保留。
+对三角齐全但缺统一 accession 的物种：在同目录硬链 `GCA_…_<原名>`（或占位 `GCA_000000000.0_`），更新 inventory 指向别名；备份 `download_inventory.pre_wgdi.tsv`；旁路 `wgdi_run_inventory.tsv` / `wgdi_accession_alias_log.tsv`。别名可删，原文件保留。
 
 ### 5.3 一键包装（推荐）
 
 ```bash
-bash "$SK/run_hxc_preprocess.sh" . \
+bash "$SK/run_wgdi_preprocess.sh" . \
   --sync-inventory \
   --prepare-accession \
   --species 900 \
@@ -129,8 +129,8 @@ bash "$SK/run_hxc_preprocess.sh" . \
 ```
 
 等价于先可选 sync/prepare，再调用  
-`/workspace/vendor/hxc-plant-genome-preprocess/scripts/run_pipeline.sh`。  
-环境变量 `HXC_ROOT` 可改 vendor 路径；默认 `PYTHON=python3`。
+`/workspace/vendor/plant-genome-wgdi-preprocess/scripts/run_pipeline.sh`。  
+环境变量 `WGDI_PREPROCESS_ROOT` 可改 vendor 路径；默认 `PYTHON=python3`。
 
 ### 5.4 产出与 2→3 出口
 
@@ -149,18 +149,18 @@ bash "$SK/run_hxc_preprocess.sh" . \
 
 ```bash
 cd /workspace/plant-genome-resources
-bash scripts/preprocess/run_hxc_preprocess.sh . --species 900 --expected-count 1
+bash scripts/preprocess/run_wgdi_preprocess.sh . --species 900 --expected-count 1
 ```
 
 ## 6. 检查点与停机条件
 
-**可继续**：catalog/matrix 已生成；canonical manifest 无「唯一选择却 empty」的关键类型；目标种 HXC summary `OK` 且 validate PASS。
+**可继续**：catalog/matrix 已生成；canonical manifest 无「唯一选择却 empty」的关键类型；目标种 preprocess summary `OK` 且 validate PASS。
 
 **停机**：
 
 - 关键物种无 gff+cds+pep 三角且下游需要 → 回阶段1补齐；**本 bridge 不自动 gffread 提取**
 - `accession_mismatch` → 跑 `--prepare-accession`
-- QC / HXC：空文件、多核 taxon、无有效代表基因、validate 失败（见 `qc-checklist.md`、`hxc-integration.md`）
+- QC / 上游流水线：空文件、多核 taxon、无有效代表基因、validate 失败（见 `qc-checklist.md`、`wgdi-preprocess-integration.md`）
 - 唯一候选为 `over_300mb` 且未获「强制纳入」说明
 
 ## 7. 与阶段1 / vendor 的衔接

@@ -4,6 +4,6 @@ __pycache__/
 *.tgz
 data/
 
-# External HXC preprocess clone — do not vendor into this repo
+# Upstream WGDI preprocess clone — do not vendor into this repo
 vendor/
-hxc-plant-genome-preprocess/
+plant-genome-wgdi-preprocess/

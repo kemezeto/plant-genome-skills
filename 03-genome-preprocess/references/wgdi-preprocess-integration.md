@@ -1,17 +1,17 @@
-# HXC 预处理对接说明
+# 上游 WGDI 预处理对接说明
 
-本阶段步骤 2+ 委托师弟仓库 **HXC-code/hxc-plant-genome-preprocess**（本地 clone：`/workspace/vendor/hxc-plant-genome-preprocess`）生成 WGDI 四件套与映射表。本 skill 负责 **step0/1 归类选 canonical**，再用 bridge 把 manifest 接到 HXC 固定路径约定。
+本阶段步骤 2+ 委托 **上游 WGDI 预处理仓**（GitHub：`https://github.com/HXC-code/hxc-plant-genome-preprocess`；本地 clone：`/workspace/vendor/plant-genome-wgdi-preprocess`；Python 包名 `pgci_preprocess`）生成 WGDI 四件套与映射表。本 skill 负责 **step0/1 归类选 canonical**，再用 bridge 把 manifest 接到上游固定路径约定。
 
 ## 仓库与入口
 
 | 项 | 路径 / 命令 |
 |----|-------------|
-| Vendor | `/workspace/vendor/hxc-plant-genome-preprocess`（保持 git clone，可 `git pull`；**勿改源文件做永久 fork**） |
-| HXC 原生入口 | `bash scripts/run_pipeline.sh DATA_ROOT [--species ID] [--expected-count N]` |
-| 本 skill 包装 | `bash scripts/preprocess/run_hxc_preprocess.sh [DATA_ROOT] [--sync-inventory] [--prepare-accession] …` |
-| PYTHONPATH | 包装脚本指向 `…/hxc-plant-genome-preprocess/scripts` |
+| Vendor | `/workspace/vendor/plant-genome-wgdi-preprocess`（保持 git clone，可 `git pull`；**勿改源文件做永久 fork**） |
+| 上游原生入口 | `bash scripts/run_pipeline.sh DATA_ROOT [--species ID] [--expected-count N]` |
+| 本 skill 包装 | `bash scripts/preprocess/run_wgdi_preprocess.sh [DATA_ROOT] [--sync-inventory] [--prepare-accession] …` |
+| PYTHONPATH | 包装脚本指向 `…/plant-genome-wgdi-preprocess/scripts` |
 
-HXC 硬性路径：
+上游硬性路径：
 
 ```text
 DATA_ROOT/data/downloads/{showid}_…
@@ -36,17 +36,17 @@ resources/wgdi_v2_manifest_sha256.tsv
 step0 catalog/matrix
   → step1 preprocess_input_manifest.tsv   （chosen_path 指向 downloads）
   → step2_sync_inventory_from_manifest.py （basename → inventory 单列）
-  → step2_prepare_hxc_inputs.py           （缺统一 GCA_/GCF_ 时硬链别名）
-  → HXC run_pipeline                      （clean_v2 + analysis_v2）
+  → step2_prepare_wgdi_inputs.py          （缺统一 GCA_/GCF_ 时硬链别名）
+  → 上游 run_pipeline                     （clean_v2 + analysis_v2）
 ```
 
-- **不要**在 inventory 的 gff/cds/pep 列写 `|` 拼接的多文件名；HXC 每列只认一个 basename。
-- sync：`gff` 优先真实 gff；若只有 gtf，则把 **gtf 文件名写入 gff 列**并打 WARNING（HXC 只读 gff 列）。GTF 语义未必被 HXC gff 解析器接受——生产数据应尽量提供 GFF3。
-- prepare：在同物种目录内为缺 accession 前缀的文件建 `GCA_…_<原名>` **硬链接**（失败则 copy），再改 inventory 指向别名；**原文件保留**。旁路表：`hxc_run_inventory.tsv`、`hxc_accession_alias_log.tsv`；首次改写前备份 `download_inventory.pre_hxc.tsv`。
+- **不要**在 inventory 的 gff/cds/pep 列写 `|` 拼接的多文件名；上游每列只认一个 basename。
+- sync：`gff` 优先真实 gff；若只有 gtf，则把 **gtf 文件名写入 gff 列**并打 WARNING（上游只读 gff 列）。GTF 语义未必被上游 gff 解析器接受——生产数据应尽量提供 GFF3。
+- prepare：在同物种目录内为缺 accession 前缀的文件建 `GCA_…_<原名>` **硬链接**（失败则 copy），再改 inventory 指向别名；**原文件保留**。旁路表：`wgdi_run_inventory.tsv`、`wgdi_accession_alias_log.tsv`；首次改写前备份 `download_inventory.pre_wgdi.tsv`。
 
 ## Accession 规则
 
-HXC `_discover_accession`：gff/cds/pep 三个 basename 中的 `^(GCA|GCF)_\d+\.\d+_` 必须 **恰好同一个**，否则 `FAIL reason=accession_mismatch`。
+上游 `_discover_accession`：gff/cds/pep 三个 basename 中的 `^(GCA|GCF)_\d+\.\d+_` 必须 **恰好同一个**，否则 `FAIL reason=accession_mismatch`。
 
 - 已有统一 NCBI 风格前缀 → 无需别名。
 - 三者不一致 → prepare 选取其一（优先 cds→pep→gff）统一加前缀硬链。
