@@ -2,12 +2,13 @@
 
 ```text
 project/
-├── raw/        # 阶段1：原始下载（可对应 plant-genome-resources/data/downloads）
-├── clean/      # 阶段2：标准化 genome/gff/cds/pep + 命名对照
-├── blast/      # 阶段3：同源搜索与过滤结果
-├── synteny/    # 阶段4：共线性区块与图
-├── tree/       # 阶段5：比对、树、支持率
-└── wgd/        # 阶段6：Ks/加倍推断与加倍共线性
+├── raw/           # 阶段1：原始下载（可对应 plant-genome-resources/data/downloads）
+├── clean_v2/      # 阶段2：基因/染色体映射与拒因
+├── analysis_v2/   # 阶段2：可比的蛋白/CDS + 简化基因位置（WGDI 四件套）
+├── blast/         # 阶段3：同源基因搜索与过滤后的命中表（基因对）
+├── synteny/       # 阶段4：共线性区块与图
+├── tree/          # 阶段5：比对、系统发育树、支持率
+└── wgd/           # 阶段6：Ks/加倍推断与加倍相关共线性
 ```
 
 阶段间只通过「上一阶段出口目录/表 + 分界检查表」交接，禁止混用未记录版本的组装。

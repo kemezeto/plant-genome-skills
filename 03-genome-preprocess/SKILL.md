@@ -12,9 +12,9 @@ description: >-
 
 | 分界 | 含义 |
 |------|------|
-| **入口 1→2** | 阶段1完成：版本/链接表齐全；目标种有所需类型（或已记缺失）；`download_inventory.tsv` 已刷新。下载物可来自多站点、格式杂乱——**先归类汇总，再清洗**。 |
-| **阶段内** | 步骤0 归类 → 步骤1 选 canonical → **步骤2 bridge + WGDI 预处理** 标准化为 WGDI bundle |
-| **出口 2→3** | `analysis_v2/s{id}/` WGDI 四件套（cds/pep/new.gff/lens）+ `clean_v2` 的 chr_map/gene_map 过上游 validate；summary `status=OK` → 回总流程进 BLAST |
+| **入口 1→2** | 阶段1完成：版本/链接表齐全；目标种有所需类型（或已记缺失）；inventory 已刷新 |
+| **阶段内** | 校验 raw → 统一命名 → 清洗/提取 CDS·pep → 染色体对照 → 粗质检（下文骨架） |
+| **出口 2→3** | `clean/` 下各物种命名统一的 genome/gff/cds/pep；染色体/scaffold 对照表齐 → 回总流程过关后进同源基因鉴定 |
 
 下载与文件夹规范见阶段1 skill（`skill-1793405308920`）。**不要**在本阶段 `--yes` 真下载大文件。  
 上游对接细节：`references/wgdi-preprocess-integration.md`。

@@ -6,8 +6,8 @@
 |------|--------------------------|------------------------|
 | 0→1 | 物种列表定稿、科学问题一句话、数据类型需求（cds/gff/pep…） | [植物组学资源检索与下载](sand-workflow:skill-1793405308920) |
 | 1→2 | `resources` 表有版本与链接；目标物种下载目录下至少有所需类型（或已记录缺失）；`download_inventory.tsv` 已刷新 | [植物基因组数据预处理](sand-workflow:skill-1793419436579) |
-| 2→3 | `analysis_v2` WGDI 四件套（cds/pep/new.gff/lens）+ `clean_v2` chr_map/gene_map 过上游 validate | 待建：BLAST |
-| 3→4 | 过滤后同源对表就绪（规则与版本已记录） | 待建：共线性 |
+| 2→3 | `analysis_v2` WGDI 四件套（cds/pep/new.gff/lens）+ `clean_v2` chr_map/gene_map 过上游 validate | 待建：同源基因鉴定（蛋白/CDS 相似性搜索 → 过滤同源对） |
+| 3→4 | 过滤后的**同源基因对表**就绪（写明 e-value/覆盖度等规则、BLAST 或 DIAMOND 版本；格式满足共线性工具要求） | 待建：共线性 |
 | 4→5 | 共线性区块可用；点图/棒图抽查通过 | 待建：系统发育 |
 | 4/5→6 | 种内或种间共线性 +（可选）单拷贝树背景 | 待建：WGD |
 | 6 结束 | WGD 假设与加倍相关共线性图有文字解读要点 | 项目归档 / 回框架复盘 |
@@ -15,5 +15,6 @@
 ## 与目录映射
 
 - 阶段 1 → `resources/` + `data/downloads/`（可视作 `raw/`）
-- 阶段 2 → `clean_v2/` + `analysis_v2/`（上游 WGDI bundle）
-- 阶段 3–6 → `blast/` `synteny/` `tree/` `wgd/`
+- 阶段 2 → `clean_v2/` + `analysis_v2/`（WGDI 就绪基因/蛋白集合）
+- 阶段 3 → `blast/`（同源搜索与过滤后的基因对）
+- 阶段 4–6 → `synteny/` `tree/` `wgd/`
