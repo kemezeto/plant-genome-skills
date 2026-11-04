@@ -3,3 +3,7 @@ __pycache__/
 .DS_Store
 *.tgz
 data/
+
+# Upstream WGDI preprocess clone — do not vendor into this repo
+vendor/
+plant-genome-wgdi-preprocess/
