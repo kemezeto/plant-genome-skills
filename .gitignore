@@ -4,6 +4,9 @@ __pycache__/
 *.tgz
 data/
 
+# WorkBuddy workspace metadata (memory, local settings)
+.workbuddy/
+
 # Upstream WGDI preprocess clone — do not vendor into this repo
 vendor/
 plant-genome-wgdi-preprocess/
